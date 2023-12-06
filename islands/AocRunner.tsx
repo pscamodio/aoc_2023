@@ -1,6 +1,5 @@
 import { useSignal } from "@preact/signals";
 import Input from "../components/Input.tsx";
-import Output from "../components/Output.tsx";
 import RunButton from "../components/RunButton.tsx";
 import Selector from "../components/Selector.tsx";
 

@@ -10,15 +10,16 @@ interface RunButtonProps {
 
 export default function RunButton(props: RunButtonProps) {
   const run = async () => {
-    console.log("run")
+    console.log("run", props.input.value);
     const url = ["/api/aoc/", props.day.value, "/", props.phase.value].join("");
-    const res = await fetch(url, {method: "POST", body: JSON.stringify(props.input.value)});
+    const res = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(props.input.value),
+    });
     const json = await res.json();
     console.log(json);
     props.output.value = JSON.stringify(json);
   };
 
-  return (
-        <Button onClick={run}>Run</Button>
-  );
+  return <Button onClick={run}>Run</Button>;
 }

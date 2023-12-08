@@ -1,13 +1,13 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference lib="dom.asynciterable" />
-/// <reference lib="deno.ns" />
+import { fetchAocInput } from "./utils/aoc-fetch.ts";
+import { assert } from "./utils/assert.ts";
 
-import "$std/dotenv/load.ts";
+const day = parseInt(Deno.args[0]) ?? 1;
+const part = parseInt(Deno.args[1]) ?? 1;
 
-import { start } from "$fresh/server.ts";
-import manifest from "./fresh.gen.ts";
-import config from "./fresh.config.ts";
+const { solve } = await import(`./days/day${day}.ts`);
 
-await start(manifest, config);
+assert(solve, "Solve import missing from day");
+
+const input = await fetchAocInput(day);
+
+console.log(solve(input, part));

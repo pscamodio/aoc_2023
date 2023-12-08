@@ -1,4 +1,3 @@
-import { Challenge } from "./challenge.ts";
 const DIGITS = "1234567890";
 const DIGIMAP = {
     "zero": "0",
@@ -42,21 +41,14 @@ function toNumbers(s: string): string[] {
 }
 
 function calNumber(s: string) : number {
+    if (s.trim().length === 0) return 0;
     const digits = toNumbers(s);
     const first = digits[0];
     const last = digits[digits.length-1];
     return parseInt([first, last].join(""));
 }
 
-function phase1(input: string): string {
+export function solve(input: string): string {
     const numbers = input.split("\n").map(calNumber);
     return numbers.reduce(function (prev, curr) { return prev + curr}, 0).toString();
 }
-
-function phase2(input: string): string {
-    return phase1(input);
-}
-
-export const day1 : Challenge = {
-    phase1, phase2
-};

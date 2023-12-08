@@ -1,4 +1,5 @@
-const DIGITS = "1234567890";
+import { isDigit } from "../utils/string.ts";
+
 const DIGIMAP = {
     "zero": "0",
     "one": "1",
@@ -20,9 +21,6 @@ function checkTextNumber(s: string): string | undefined {
     }
 }
 
-function isDigit(s: string): boolean {
-    return DIGITS.includes(s);
-}
 
 function toNumbers(s: string): string[] {
     const numbers : string[] = [];

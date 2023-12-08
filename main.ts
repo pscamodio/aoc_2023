@@ -1,4 +1,4 @@
-import { fetchAocInput } from "./utils/aoc-fetch.ts";
+import { fetchAocInput } from "./utils/aoc.ts";
 import { assert } from "./utils/assert.ts";
 
 const day = parseInt(Deno.args[0]) ?? 1;

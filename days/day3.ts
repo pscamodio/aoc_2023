@@ -1,3 +1,4 @@
+import { createSolver } from "../utils/aoc.ts";
 import { array_sum } from "../utils/array.ts";
 import { isDigit, isNonEmpty } from "../utils/string.ts";
 
@@ -51,7 +52,7 @@ function addPartNumbers(lines: string[], lineNum: number, nums: number[], parts:
     }
 }
 
-export function solve(input: string = DEMO_INPUT): string {
+export function solve1(input: string = DEMO_INPUT): string {
     const lines = input.split("\n").filter(isNonEmpty);
     const nums: number[] = [];
     const parts = computeSymbolIndexes(lines);
@@ -61,3 +62,9 @@ export function solve(input: string = DEMO_INPUT): string {
     }
     return array_sum(nums).toString();
 }
+
+export function solve2(input: string = DEMO_INPUT): string {
+    return input;
+}
+
+export const solve = createSolver(solve1, solve2);

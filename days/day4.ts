@@ -40,8 +40,27 @@ function solve1(input = DEMO_INPUT): string {
     return array_sum(scores).toString();
 }
 
+
+function computeScore2(c: Card): number {
+    let score = 0;
+    for (const winner of c.winners) {
+        if (c.numbers.includes(winner)) {
+            score += 1;
+        }
+    }
+    return score;
+}
+
 function solve2(input = DEMO_INPUT): string {
-    return input;
+    const lines = input.split("\n").filter(isNonEmpty);
+    const scores = lines.map(parseCard).map(computeScore2);
+    const amounts = new Array(scores.length).fill(1);
+    for (const index of scores.keys()) {
+        for (let i=1; i<=scores[index]; ++i) {
+            amounts[index + i] += amounts[index];
+        }
+    }
+    return array_sum(amounts).toString();
 }
 
 export const solve = createSolver(solve1, solve2);

@@ -1,6 +1,11 @@
 import { assert } from "./assert.ts";
+import { exists } from "https://deno.land/std@0.208.0/fs/mod.ts";
 
 export async function fetchAocInput(day: number) {
+    const localCachePath = `.aoc/day${day}.txt`;
+    if (await exists(localCachePath)) {
+        return await Deno.readTextFile(localCachePath);
+    }
     const session = Deno.env.get("AOC_SESSION");
     assert(session, "Define AOC_SESSION to point to the AOC session cookie");
     const res = await fetch(`https://adventofcode.com/2023/day/${day}/input`, {
@@ -8,7 +13,10 @@ export async function fetchAocInput(day: number) {
             cookie: `session=${session}`
         }
     })
-    return res.text();
+    const text = await res.text();
+    Deno.mkdir(".aoc", { recursive: true});
+    await Deno.writeTextFile(localCachePath, text);
+    return text;
 }
 
 type Solver = (input?: string) => string;

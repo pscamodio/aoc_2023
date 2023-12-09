@@ -19,15 +19,15 @@ export async function fetchAocInput(day: number) {
     return text;
 }
 
-type Solver = (input?: string) => string;
+type Solver = ((input?: string) => string) | ((input?: string) => Promise<string>);
 
 export function createSolver(part1: Solver, part2: Solver) {
-    return (input: string, part: 1|2) => {
+    return async (input: string, part: 1|2) => {
         switch(part){
             case 1:
-                return part1(input);
+                return await part1(input);
             case 2:
-                return part2(input);
+                return await part2(input);
         }
     }
 }

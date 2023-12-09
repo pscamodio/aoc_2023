@@ -12,7 +12,7 @@ assert(solve, "Solve import missing from day");
 const input = await fetchAocInput(day);
 
 const start = performance.now();
-const solution = solve(demo ? undefined : input, part);
+const solution = await solve(demo ? undefined : input, part);
 const took = performance.now() - start;
 console.log("Solved in", took.toFixed(3), "ms");
 console.log(solution);

@@ -32,7 +32,7 @@ function parseInput(input: string): [string, Map<string, Node>] {
     return [pattern, parseNodes(nodes.split("\n"))];
 }
 
-function walkPath(pattern: string, nodes: Map<string, Node>) : numbers {
+function walkPath(pattern: string, nodes: Map<string, Node>) : number {
     let pos = "AAA";
     let steps = 0;
     while(true) {

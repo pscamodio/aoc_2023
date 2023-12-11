@@ -24,6 +24,13 @@ function move(from: Index, row: number, col: number): Index {
     };
 }
 
+function diff(from: Index, to: Index): Index {
+    return {
+        row: from.row - to.row,
+        col: from.col - to.col,
+    }
+};
+
 function isSameIndex(a: Index, b: Index): boolean {
     return a.row == b.row && a.col === b.col;
 }
@@ -51,7 +58,7 @@ class Grid {
         for (const [row, line] of this.lines.entries()) {
             const col = line.indexOf(letter);
             if (col >= 0) {
-                return {row, col};
+                return { row, col };
             }
         }
         throw new Error("Not found");
@@ -93,8 +100,8 @@ class Grid {
     traverse(start: Index, next: Index): Index[] | undefined {
         let from = start;
         let to = next;
-        const path : Index[] = [start];
-        while(true) {
+        const path: Index[] = [start];
+        while (true) {
             path.push(to);
             const nextConnections = this.validConnections(to);
             const pathForward = nextConnections.find((path) => !isSameIndex(from, path));
@@ -104,8 +111,8 @@ class Grid {
             to = pathForward;
         }
     }
-    
-    findLoop() : Index[] {
+
+    findLoop(): Index[] {
         const startIndex = this.find("S");
         const paths = this.validConnections(startIndex);
         for (const path of paths) {
@@ -117,26 +124,48 @@ class Grid {
         throw new Error("Not Found");
     }
 
-    isInsideGrid(point: Index) : boolean {
+    isInsideGrid(point: Index): boolean {
         return point.col >= 0 && point.col < this.cols && point.row >= 0 && point.row < this.rows;
+    }
+
+    adjustS(loop: Index[]): void {
+        if (this.get(loop[0]) !== "S") return;
+
+        const prev = diff(loop[0], loop[loop.length - 1]);
+        const next = diff(loop[1], loop[0]);
+
+        const north = prev.row === -1 || next.row === -1;
+        const south = prev.row === 1 || next.row === 1;
+        const west = prev.col === -1 || next.col === -1;
+        const east = prev.col === 1 || next.col === 1;
+
+        const realS = (() => {
+            if (north && south) return "|";
+            if (north && east) return "L";
+            if (north && west) return "J";
+            if (east && west) return "-";
+            if (south && east) return "F";
+            return "7";
+        })();
+
+        this.lines[loop[0].row] = this.lines[loop[0].row].replace("S", realS);
     }
 
     rayCast(from: Index, loop: Index[]): number {
         let toCheck = move(from, 0, 1);
         let count = 0;
-        let maybeHit : Index[] | undefined = undefined;
+        let maybeHit: Index[] | undefined = undefined;
 
         const checkHit = () => {
             if (!maybeHit) return;
             const letters = maybeHit.map((index) => this.get(index));
             if (
-                letters.includes("|") || 
-                letters.includes("S") || //works only on my input as the S is a vertical line
+                letters.includes("|") ||
                 letters.includes("L") && letters.includes("7") ||
                 letters.includes("J") && letters.includes("F")
-                ) {
-                    count++;
-                }
+            ) {
+                count++;
+            }
             maybeHit = undefined;
         }
 
@@ -145,7 +174,7 @@ class Grid {
             if (loopIndex !== -1) {
                 if (!maybeHit) {
                     maybeHit = [toCheck];
-                } else {             
+                } else {
                     const prev = loop[loopIndex - 1] ?? loop[loop.length - 1];
                     const next = loop[loopIndex + 1] ?? loop[0];
                     const sameHit = isSameIndex(prev, from) || isSameIndex(next, from);
@@ -183,10 +212,11 @@ function solve1(input = DEMO_INPUT): string {
 function solve2(input = DEMO_INPUT): string {
     const grid = new Grid(input);
     const loop = grid.findLoop();
+    grid.adjustS(loop);
     let counter = 0;
     for (let row = 0; row < grid.rows; ++row) {
         for (let col = 0; col < grid.cols; ++col) {
-            const index = {row, col};
+            const index = { row, col };
             if (grid.isInsideLoop(index, loop)) {
                 counter++;
             }

@@ -13,7 +13,7 @@ const DEMO_INPUT = `...#......
 #...#.....
 `;
 
-function transpose(grid: number[][]): number[][] {
+function transposed(grid: number[][]): number[][] {
     const transposed : number[][] = [];
     for (let col=0; col < grid[0].length; ++col) {
         const newRow : number[] =  [];
@@ -53,8 +53,7 @@ class Universe {
             }
             return res;
         }, []);
-        const transposed = transpose(this.grid);
-        this.emptyCols = transposed.reduce((res, curr, currIndex) => {
+        this.emptyCols = transposed(this.grid).reduce((res, curr, currIndex) => {
             if (curr.every((val) => val === 0)) {
                 return [...res, currIndex];
             }

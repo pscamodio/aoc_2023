@@ -1,6 +1,5 @@
 import { createSolver } from "../utils/aoc.ts";
 import { array_sum, combinations } from "../utils/array.ts";
-import { manhattanDistance } from "../utils/math.ts";
 
 const DEMO_INPUT = `...#......
 .......#..
@@ -35,6 +34,9 @@ type Index = {
 class Universe {
     grid: number[][];
 
+    emptyRows: number[];
+    emptyCols: number[];
+
     constructor(input: string) {
         const lines = input.trim().split("\n");
         this.grid = [];
@@ -45,24 +47,19 @@ class Universe {
             }
             this.grid.push(row);
         }
-        this.grow();
-    }
-
-    grow(): void {
-        const growRows = () => {
-            const newRows : number[][] = [];
-            for (const row of this.grid) {
-                newRows.push(row);
-                if (row.every((value) => value === 0)) {
-                    newRows.push(row);
-                }
+        this.emptyRows = this.grid.reduce((res, curr, currIndex) => {
+            if (curr.every((val) => val === 0)) {
+                return [...res, currIndex];
             }
-            this.grid = newRows;
-        }
-        growRows();
-        this.grid = transpose(this.grid);
-        growRows();
-        this.grid = transpose(this.grid);
+            return res;
+        }, []);
+        const transposed = transpose(this.grid);
+        this.emptyCols = transposed.reduce((res, curr, currIndex) => {
+            if (curr.every((val) => val === 0)) {
+                return [...res, currIndex];
+            }
+            return res;
+        }, []);
     }
 
     galaxies(): Index[] {
@@ -80,18 +77,34 @@ class Universe {
     toString(): string {
         return this.grid.join("\n");
     }
+
+    distance(from: Index, to: Index, expansion = 2) : number {
+        const rowRange = [Math.min(from.row, to.row), Math.max(from.row, to.row)];
+        const colRange = [Math.min(from.col, to.col), Math.max(from.col, to.col)];
+
+        const expandingRows = this.emptyRows.filter((row) => rowRange[0] < row && row < rowRange[1]).length;
+        const expandingCols = this.emptyCols.filter((col) => colRange[0] < col && col < colRange[1]).length;
+
+        const rowDistance = rowRange[1] - rowRange[0] + expandingRows * (expansion - 1);
+        const colDistance = colRange[1] - colRange[0] + expandingCols * (expansion - 1);
+
+        return rowDistance + colDistance;
+    }
 }
 
 
 function solve1(input = DEMO_INPUT): string {
     const universe = new Universe(input);
     const pairs = combinations(universe.galaxies());
-    const distances = pairs.map(([from, to]) => manhattanDistance(from.row, from.col, to.row, to.col));
+    const distances = pairs.map(([from, to]) => universe.distance(from, to));
     return array_sum(distances).toString();
 }
 
 function solve2(input = DEMO_INPUT): string {
-    return input;
+    const universe = new Universe(input);
+    const pairs = combinations(universe.galaxies());
+    const distances = pairs.map(([from, to]) => universe.distance(from, to, 1000000));
+    return array_sum(distances).toString();
 }
 
 export const solve = createSolver(solve1, solve2);

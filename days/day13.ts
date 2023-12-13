@@ -29,33 +29,33 @@ function parseInput(input: string): Pattern[] {
     return input.trim().split("\n\n").map((block) => block.split("\n"));
 }
 
-function checkRowReflectionColumn(pattern: Pattern, rowIndex: number, colIndex: number) : boolean {
+function reflectionDifferences(pattern: Pattern, rowIndex: number, colIndex: number) : number {
     let distance = 1;
+    let differences = 0;
     while(true) {
         const topRow = pattern[rowIndex - distance + 1];
         const bottomRow = pattern[rowIndex + distance];
-        if (!topRow || !bottomRow) return true;
+        if (!topRow || !bottomRow) return differences;
         if (topRow[colIndex] !== bottomRow[colIndex]) {
-            return false;
+            differences += 1;
         }
         distance += 1;
     }
 }
 
-function isReflectionRow(pattern: Pattern, rowIndex: number): boolean {
+function isReflectionRow(pattern: Pattern, rowIndex: number, diff: number): boolean {
+    let count = 0;
     for (let colIndex = 0; colIndex !== pattern[0].length; ++colIndex) {
-        if (!checkRowReflectionColumn(pattern, rowIndex, colIndex)) {
-            return false;
-        }
+        count += reflectionDifferences(pattern, rowIndex, colIndex);
     }
-    return true;
+    return count === diff;
 }
 
-function findReflection(pattern: Pattern): Reflection[] {
+function findReflection(pattern: Pattern, diff: number): Reflection[] {
     const reflections : Reflection[] = [];
     for (const rowIndex of pattern.keys()) {
         if (rowIndex === pattern.length - 1) continue;
-        if (isReflectionRow(pattern, rowIndex)) {
+        if (isReflectionRow(pattern, rowIndex, diff)) {
             reflections.push({
                 index: rowIndex + 1,
                 orientation: "horizontal",
@@ -65,7 +65,7 @@ function findReflection(pattern: Pattern): Reflection[] {
     const flipped = transposed(pattern);
     for (const rowIndex of flipped.keys()) {
         if (rowIndex === flipped.length - 1) continue;
-        if (isReflectionRow(flipped, rowIndex)) {
+        if (isReflectionRow(flipped, rowIndex, diff)) {
             reflections.push({
                 index: rowIndex + 1,
                 orientation: "vertical",
@@ -79,7 +79,7 @@ function solve1(input = DEMO_INPUT): string {
     const patterns = parseInput(input);
 
     const reflections = patterns.map((p) => {
-        const r = findReflection(p);
+        const r = findReflection(p, 0);
         return r;
     });
 
@@ -91,7 +91,19 @@ function solve1(input = DEMO_INPUT): string {
 }
 
 function solve2(input = DEMO_INPUT): string {
-    return input;
+    const patterns = parseInput(input);
+
+    const reflections = patterns.map((p) => {
+        const r = findReflection(p, 1);
+        return r;
+    });
+
+    return reflections.reduce((value, next) => {
+        console.log(next);
+        const columns = next.filter(({orientation}) => orientation === "vertical").at(-1)?.index ?? 0;
+        const rows = next.filter(({orientation}) => orientation === "horizontal").at(-1)?.index ?? 0;
+        return value + columns + rows * 100;
+    }, 0).toString();
 }
 
 export const solve = createSolver(solve1, solve2);
